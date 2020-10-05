@@ -1,0 +1,67 @@
+<html>
+<head>
+    <title>Travelmap</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <style>
+            .bd-placeholder-img {
+              font-size: 1.125rem;
+              text-anchor: middle;
+              -webkit-user-select: none;
+              -moz-user-select: none;
+              -ms-user-select: none;
+              user-select: none;
+            }
+      
+            @media (min-width: 768px) {
+              .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+              }
+            }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/menu_booty.css') }}" type="text/css">
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/sign-in/">
+</head>
+<body class="text-center">
+    <nav class="navbar  navbar-dark bg-dark">
+        <a class="navbar-brand" href="#"><img class="icon" src="{{ url_for('static', filename='t-m-logo-white-sm_41x52_shrank_edges.png') }}"></a>
+            <form class="form-inline my-2 my-lg-0 float-to-end" method="GET" action="/register">
+                <!-- <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"> -->
+                <div class="my-2 my-sm-0 register">Not registered yet?</div>
+                <button class="btn btn-outline-success my-2 my-sm-0 signup-btn" type="submit">Sign-up</button>
+            </form>
+    </nav>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class='container'>
+        {% for category, message in messages %}
+        <div class="alert alert-{{category}} alert-dismissible">
+          <a href="/signin" class="close" datsmiss="alert" aria-label="close">&times;</a>
+          {{ message }}
+        </div> 
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+    <form class="form-signin" method="POST" action="/signin">
+        <img class="mb-4 logo" src="{{ url_for('static', filename='travel-map-logo-white.png')}}" alt="" width="100" height="78">
+        <h1 class="h3 mb-3 font-weight-bold sign-in">Please sign in</h1>
+        <label for="email" class="sr-only">Email address</label>
+        <input type="email" name="email" class="form-control" placeholder="Email address" required="" autofocus="">
+        <label for="password" class="sr-only">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="Password" required="">
+        <div class="checkbox mb-3">
+          <label>
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block signin-btn" type="submit">Sign in</button>
+        <p class="mt-5 mb-3 text-muted">© 2017-2020</p>
+    </form>
+    <script src="{{ url_for('static', filename='jwt-vanilla.js')}}"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{% extends "template.html" %}
+
+{% block description%}
+<meta name="description" content="Test">
+{% endblock %}
+
+{% block author %} {{super()}} {% endblock %}
+
+{% block title %} Photo albums {% endblock %}
+
+{% block home %}
+{{ url_for('userhome', user_id=user_id) }}
+{% endblock %}
+{% block nav %}
+    {{ super() }}
+{% endblock %}
+{% block bodybottom %}
+    <main role="main">
+        <section class="jumbotron text-center">
+            <div class="container">
+                <h1>Lidia's Photo Albums</h1>
+                <p class="lead text-muted">Live your life by a compass, not a clock</p>
+                <p>
+                    <a href="#" class="btn btn-primary my-2">Create</a>
+                    <a href="#" class="btn btn-secondary my-2">Update</a>
+                </p>
+            </div>
+        </section>
+
+        <div class="album py-5 bg-light">
+            <div class="container">
+                {%for trip_id in trips%}
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
+                            xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false"
+                            role="img" aria-label="Placeholder: Thumbnail">
+                            <title>Placeholder</title>
+                            <rect width="100%" height="100%" fill="#55595c" /><text x="50%" y="50%" fill="#eceeef"
+                                dy=".3em">Thumbnail</text>
+                        </svg>
+                        <div class="card-body">
+                            <p class="card-text"> {{ trip_id }} </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        onclick=showpics()>View</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                                </div>
+                                <small class="text-muted">9 mins</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {%endfor%}
+            </div>
+        </div>
+    </main>
+    <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../assets/js/vendor/jquery.slim.min.js"><\/script>')</script>
+    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script> -->
+{% endblock %}

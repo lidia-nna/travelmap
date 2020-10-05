@@ -1,0 +1,78 @@
+body, html {
+    width: 100%;
+    height: 100%;
+    /* font-family: 'Montserrat', sans-serif; */
+    background: url('../vc_road.jpg') no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+  }
+  
+  .navbar-brand{
+      padding-top: 0;
+      padding-bottom: 0;
+  }
+  
+  .float-to-end {
+      float: inline-end;
+  }
+  
+  .register {
+      color: white;
+      padding: 7px;
+  }
+  .form-signin {
+      width: 50%;
+      max-width: 330px;
+      padding: 15px;
+      margin: auto;
+      margin-top: 6em;
+      color: white;
+  }
+  .logo {
+      background-color: #121ad5;
+      /* background-color: rgb(1, 87, 1); */
+      border: solid 3px white;
+      border-radius: 10px;
+  }
+  
+  .sign-in {
+      text-shadow: 2px 2px rgb(10, 10, 10);
+      /* color: rgb(29, 28, 28);  */
+  } 
+  .signin-btn {
+      background-color: #1579fd;
+      border-color: #1579fd;
+  }
+  .signup-btn {
+      border-color: #519bfd;
+      color: #519bfd;
+  }
+  
+  .signup-btn:hover {
+      background-color: #1579fd;
+  }
+  
+  
+  /* .container{
+      border-color: indigo;
+  } */
+  /* .row {
+      background-color: hotpink;
+  
+  }
+  
+  section {
+      margin: 0 50% 0 0;
+      border: 3px solid;
+      border-color:black;
+      height: 100%;
+      display: flex;
+      justify-content: flex-end;
+      
+  }
+  
+  #map {
+      height: 50%;
+  } */

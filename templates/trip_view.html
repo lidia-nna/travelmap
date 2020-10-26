@@ -1,0 +1,25 @@
+{% extends "template.html" %}
+
+{% block description%}
+<meta name="description" content="Test">
+{% endblock %}
+
+{% block author %} {{super()}} {% endblock %}
+
+{% block title %} Trips {% endblock %}
+
+
+{% block nav %}
+{{ super() }}
+{% endblock %}
+
+{% block bodybottom %}
+<button id="logout" onclick="logout()">Logout</button>
+<div id="result"></div>
+<button onclick="getResource('http://127.0.0.1:5000/secret','result')">get secret message</button>
+<div id="map" style="height:50%"></div>
+<script type="text/javascript" src="{{ url_for('static', filename='jwt-vanilla.js')}}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='main.js')}}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZTMjDgOFNnaYJREz7vAauJ6rUN2od6Ow&callback=initMap" async
+    defer></script>
+{% endblock %}

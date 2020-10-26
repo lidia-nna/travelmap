@@ -1,0 +1,33 @@
+{% extends "template.html"%}
+
+{% block description%}
+<meta name="description" content="Image gallery">
+{% endblock %}
+
+{% block author %} {{super()}} {% endblock %}
+
+{% block title %} Image gallery {% endblock %}
+
+{% block customstyle%}
+<link rel="stylesheet" href="{{url_for('static', filename='css/collection.css')}}">
+{% endblock %}
+{% block home %}
+{{ url_for('userhome', user_id=user_id) }}
+{% endblock %}
+{% block nav %}
+{{ super() }}
+{% endblock %}
+{% block bodybottom %}
+
+<div class="gallery">
+    {% for image in images %}
+    <div class="gallery-cell">
+        <!-- <img src="/static/uploads/{{user_id}}/{{trip_id}}/{{image}}" alt=""> -->
+        <img id="{{image}}" src="{{ url_for('imageretrieve', user_id=user_id, filename=image) }}" onclick="toggleImage('{{image}}','{{user_id}}');" alt="">
+        <!-- <p>{{ image }}</p> -->
+    </div>
+    {%endfor%}
+</div>
+<script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+<script src="{{ url_for('static', filename='get_trip_images.js') }}"></script> 
+{% endblock %}

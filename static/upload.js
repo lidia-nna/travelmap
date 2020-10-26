@@ -1,6 +1,7 @@
 
 
 function createInput(value){
+    console.log('Running createInput! for',value)
     var inputTag = document.createElement("img");
     inputTag.id=value
     inputTag.className="img-fluid rounded shadow-sm mx-auto d-block"
@@ -12,7 +13,19 @@ function createInput(value){
     SHOW UPLOADED IMAGE
 * ========================================== */
 var picArea = document.getElementsByClassName('image-area mt-4')[0];
-function readURL(input) {
+    console.log('picArea: ', picArea)
+
+function readURL(input) {   
+    var ChildNodes = picArea.childNodes
+    var childNumber = ChildNodes.length
+    console.log('ChildNodes:',ChildNodes)
+    if (childNumber > 0) {
+        for (i=0; i<childNumber;i++){
+            console.log('Child:',ChildNodes[i])
+            picArea.removeChild(ChildNodes[i])
+        }
+    }
+    // ChildNodes.forEach(Child => picArea.removeChild(Child))
     if (input.files && input.files[0]) {
         for (i=0; i< input.files.length; i++){
             var file = input.files[i];
@@ -23,6 +36,7 @@ function readURL(input) {
             reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(newInput);
             console.log(newInput.src)
             reader.readAsDataURL(file); 
+
         }
     }
 }

@@ -16,6 +16,10 @@ class MarkerModel(db.Model):
     def find_all_markers(cls):
         return [marker.id for marker in cls.query.all()]
 
+    @classmethod
+    def find_by_id(cls, marker_id):
+        return cls.query.filter_by(id=marker_id).first()
+
 
     def save_to_db(self):
         db.session.add(self)

@@ -1,0 +1,129 @@
+{% extends "template.html"%}
+
+{% block description%}
+<meta name="description" content="Upload images">
+{% endblock %}
+
+{% block author %} {{super()}} {% endblock %}
+
+{% block title %} Upload {% endblock %}
+
+{% block customstyle%}
+<link rel="stylesheet" href="{{url_for('static', filename='css/custom.css')}}">
+{% endblock %}
+{% block home %}
+{{ url_for('userhome', user_id=user_id) }}
+{% endblock %}
+{% block nav %}
+{{ super() }}
+{% endblock %}
+{% block bodybottom %}
+<div class="container py-5">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class='container'>
+        {% for category, message in messages %}
+        <div class="alert alert-{{category}} alert-dismissible">
+            <a href="/signin" class="close" datsmiss="alert" aria-label="close">&times;</a>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- For demo purpose -->
+    <header class="text-white text-center">
+        <h1 class="display-4">Create a trip</h1>
+        <img src="{{url_for('static', filename='travel-map-logo-white.png')}}" alt="" width="250"
+            class="mb-4">
+    </header>
+
+
+    <div class="row py-4">
+        <div class="col-lg-6 mx-auto text-center">
+            <!-- <form id="tripForm" method="post" action="{{ url_for('newtrip', user_id=user_id)}}"> -->
+                <form id="tripForm" action="javascript:postData('{{user_id}}')">
+                <!-- Name trip -->
+                <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
+                    <label for="trip_id" class="btn m-0 font-weight-light text-muted">Name</label>
+                    <input type="text" class="form-control-plaintext" name="trip_id" id="trip_id" required>
+                </div>
+                <!-- Describe trip-->
+                <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
+                    <label for="description"  class="btn m-0 font-weight-light text-muted">Description</label>
+                    <input type="text" class="form-control-plaintext" name="description" id="description" required>    
+                </div>
+                <!-- Set trip colour -->
+                <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
+                    <label for="marker_colour" class="btn m-0 font-weight-light text-muted ">Marker pin color </label>
+                    <input type="color" name="marker_colour" id="marker_colour" value="#ff0000" required>
+                </div>
+                <!-- Hidden pin type -- to be changed if other pins have been added -->
+                <div>
+                    <input type="hidden" name="marker_id" value="pin">
+                </div>
+                <!-- Countries for pictures with NO geolocation encoded -->
+                <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
+                    <label class="btn m-0 font-weight-light text-muted">Select countries</label>
+                    <select class="custom-select form-control border-0 font-weight-light" name="countries" multiple size="1"
+                    form="tripForm" required>
+                        <option selected>choose country</option>
+                        <option value="Poland">Poland</option>
+                        <option value="USA">USA</option>
+                        <!-- <option selected></option>
+                        {% for country in countries%}
+                        <option value="{{ country }}">{{ country }}</option>
+                        {% endfor %} -->
+                    </select>
+                </div>
+                <button class="btn btn-outline-primary" type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+    <!-- Modal for image upload-->
+    <div class="modal fade" id="addedModal" tabindex="-1" role="dialog" aria-labelledby="addedModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="addedModalLabel">You've added a new trip!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+            Go ahead and upload your pictures now :)
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="callUpload('{{user_id}}')">Upload</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="modal fade" id="updatedModal" tabindex="-1" role="dialog" aria-labelledby="updatedModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="addedModalLabel">This trip has already been added!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+             Add more images to the existing trip:)
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="callUpload('{{user_id}}')">Upload</button>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<!-- <script src="{{url_for('static', filename='newTrip.js')}}"></script> -->
+{% endblock %}
+{% block customscripts%}
+<script src="{{url_for('static', filename='newTrip.js')}}"></script>
+{% endblock %}

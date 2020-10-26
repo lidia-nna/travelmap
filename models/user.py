@@ -14,12 +14,18 @@ class UserModel(db.Model):
     registered_on = db.Column(db.DateTime, nullable=False)
     confirmed = db.Column(db.Boolean, nullable=False, default = False)
     confirmed_on = db.Column(db.DateTime, nullable=True)
+    trips = db.relationship("TripsModel", passive_deletes="all", backref="parent")
+    images = db.relationship("ImagesModel", passive_deletes="all", backref="parent")
 
-    def __init__(self, email, confirmed=False, confirmed_on=None):
+    def __init__(self, email, confirmed=False, registered_on=None, confirmed_on=None):
+        # self.id = id
         self.email = email
         self.username = email.split('@')[0]
         self.passwd_hash = None
-        self.registered_on = datetime.datetime.now()
+        if registered_on is None:
+            self.registered_on = datetime.datetime.now()
+        else:
+            self.registered_on = registered_on
         self.confirmed = confirmed
         self.confirmed_on = confirmed_on
 

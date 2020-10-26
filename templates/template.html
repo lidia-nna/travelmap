@@ -38,12 +38,12 @@
                     <a class="nav-link" href="#">Timeline</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="{{ url_for('images', user_id=user_id )}}" id="navbarDropdown" role="button"
+                    <a class="nav-link dropdown-toggle" href="{{ url_for('imagesummary', user_id=user_id )}}" id="navbarDropdown" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Trips
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url_for('images', user_id=user_id )}}">The Photo Collection</a>
+                        <a class="dropdown-item" href="{{ url_for('newtrip', user_id=user_id )}}">Add a trip</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="upload">Upload photos</a>
                     </div>
@@ -54,7 +54,7 @@
                         Photos
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url_for('images', user_id=user_id )}}">The Photo Collection</a>
+                        <a class="dropdown-item" href="{{ url_for('imagesummary', user_id=user_id )}}">The Photo Collection</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{{ url_for('imageupload', user_id=user_id )}}">Upload photos</a>
                     </div>
@@ -76,5 +76,7 @@ integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRk
 integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
 integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    {% block customscripts%}
+    {% endblock %}
     </body>
 </html>

@@ -23,6 +23,9 @@
   max-width: 40rem;
 }
 
+img, p {
+  cursor: pointer;
+}
 footer {
   padding-top: 3rem;
   padding-bottom: 3rem;
@@ -31,3 +34,5 @@ footer {
 footer p {
   margin-bottom: .25rem;
 }
+
+

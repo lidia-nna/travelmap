@@ -2,7 +2,7 @@
 // var markers;
 
 function initMap() {
-map = new google.maps.Map(document.getElementById('map'), {
+const map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 15.262, lng: 9.687},
     zoom: 2,
     mapTypeId: 'hybrid',

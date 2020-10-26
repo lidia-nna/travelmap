@@ -1,0 +1,84 @@
+{% extends "template.html" %}
+
+{% block description%}
+<meta name="description" content="Test">
+{% endblock %}
+
+{% block author %} {{super()}} {% endblock %}
+
+{% block title %} Photo albums {% endblock %}
+
+{% block customstyle%}
+<link rel="stylesheet" href="{{url_for('static', filename='css/album.css')}}">
+<style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block home %}
+{{ url_for('userhome', user_id=user_id) }}
+{% endblock %}
+{% block nav %}
+    {{ super() }}
+{% endblock %}
+{% block bodybottom %}
+    <main role="main">
+        <section class="jumbotron text-center">
+            <div class="container">
+                <h1>Trips in pictures</h1>
+                <p class="lead text-muted">Live your life by a compass, not a clock</p>
+                <p>
+                    <a href="#" class="btn btn-primary my-2">Create</a>
+                    <a href="#" class="btn btn-secondary my-2">Update</a>
+                </p>
+            </div>
+        </section>
+
+        <div class="album py-5 bg-light">
+            <div class="container">
+                <div class="row">
+                    {% for trip_id, front_image in covers.items() %}
+                    
+                <div class="col-md-4">
+                    <!-- href="{{ url_for('imagecollection', user_id=user_id, trip_id=trip_id) }}" -->
+                    <a href="{{ url_for('imagecollection', user_id=user_id, trip_id=trip_id) }}">
+                        <div class="card mb-4 box-shadow">
+                            <!-- <img class="card-img-top" src="/static/uploads/{{user_id}}/IMG_2809_thumbnail.JPG" alt="Card image cap"> -->
+                            {% if front_image == "blank_page.png" %}
+                                <img class="card-img-top" src="{{ url_for('static', filename=front_image) }}" alt="Card image cap"> 
+                            {% else %}
+                                <img class="card-img-top" src="{{ url_for('imageretrieve', user_id=user_id, filename=front_image) }}" alt="Card image cap"> 
+                            {% endif %}
+                              <div class="card-body">
+                                  <p class="card-text text-muted text-center"> {{ trip_id }} </p>
+                                  <div class="d-flex justify-content-between align-items-center">
+                                  </div>
+                              </div>
+                        </div>
+                    </a>
+                </div>
+                {%endfor%}
+                </div>              
+            </div>
+        </div>
+    </main>
+    <script src="/static/get_trip_images.js"></script> 
+    <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../assets/js/vendor/jquery.slim.min.js"><\/script>')</script>
+    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script> -->
+{% endblock %}

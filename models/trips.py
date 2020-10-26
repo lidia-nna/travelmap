@@ -7,17 +7,26 @@ class TripsModel(db.Model):
 
     __tablename__ = 'trips'
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
     trip_id = db.Column(db.String(255),primary_key=True)
-    trip_marker_id = db.Column(db.String(100), db.ForeignKey('markers.id'))
+    description = db.Column(db.String(255))
+    marker_colour = db.Column(db.String(100))
+    marker_id = db.Column(db.String(100), db.ForeignKey('markers.id'))
+    countries = db.Column(db.PickleType)
     markers = db.relationship("MarkerModel")
     images = db.relationship("ImagesModel")
-    users = db.relationship("UserModel")
-
-    def __init__(self, user_id, trip_id, trip_marker_id):
+    users = db.relationship("UserModel")#, cascade="all, delete", backref="children")
+    
+    def __init__(self, user_id, trip_id, description, marker_colour, marker_id, countries):
         self.user_id = user_id
         self.trip_id = trip_id
-        self.trip_marker_id = trip_marker_id
+        self.description = description
+        self.marker_colour = marker_colour
+        self.marker_id = marker_id
+        if countries:
+            self.countries = countries
+        else:
+            self.countries = None
 
 
     # (select * from trip_details join markers on trip_details.trip_marker_id=markers.id) as foo
@@ -38,7 +47,8 @@ class TripsModel(db.Model):
         return rows
     @classmethod
     def find_trip_list(cls, user_id):
-        return db.session.query(cls.trip_id).filter_by(user_id=user_id)
+        return [trip_id_tuple[0] for trip_id_tuple in list(db.session.query(cls.trip_id).filter_by(user_id=user_id))]
+
     @staticmethod
     def json():
         rows = TripsModel.find_all_trips()
@@ -54,8 +64,8 @@ class TripsModel(db.Model):
             for row in rows
         ]
     @classmethod
-    def find_by_id(cls, trip_id):
-        return cls.query.filter_by(trip_id=trip_id).first()
+    def find_by_id(cls, trip_id, user_id):
+        return cls.query.filter_by(trip_id=trip_id).filter_by(user_id=user_id).first()
 
     @classmethod
     def find_all(cls, user):

@@ -1,0 +1,40 @@
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-gap: 2px;
+    
+  }
+
+.gallery-cell {
+    position: relative;
+    padding: 1rem;
+
+}
+
+.gallery-cell::before {
+    content:"";
+    padding-top: 100%;
+    display:block;
+    
+}
+
+
+
+.gallery-cell > img {
+    
+    position: absolute;
+    top: 0;
+    left: 0;
+    width:100%;
+    margin:auto;
+    bottom:0;
+    right: 0;
+    cursor: pointer;
+    
+    /* transition: all 0.3s ease-out; */
+    
+    
+}
+img:hover {
+    
+}

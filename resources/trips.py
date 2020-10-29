@@ -12,8 +12,10 @@ class Trips(Resource):
             render_template(
                 'trips.html', 
                 user_id = user_id, 
-                markers = TripsModel.find_coordinates(user_id=user_id)), 
+                markers = TripsModel.find_coordinates(user_id=user_id), 
+                trips = TripsModel.find_trip_colours(user_id=user_id)),
             200)
+
 
 
 class NewTrip(Resource):

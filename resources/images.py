@@ -40,7 +40,8 @@ class ImageCollection(Resource):
             'trip_collection.html', 
             trip_id=trip_id, 
             user_id=user_id, 
-            images=ImagesModel.find_thumbnails(trip_id=trip_id, user_id=user_id)
+            images=ImagesModel.find_thumbnails(trip_id=trip_id, user_id=user_id),
+            description=TripsModel.find_by_id(trip_id=trip_id, user_id=user_id).description
             )
         )
 class ShowImage(Resource):
@@ -101,6 +102,7 @@ class ImageUpload(Resource):
             try:
                 imageMetadata = MetadataExtractor(filepath)
                 imageMetadata.extract()
+                imageMetadata.print_me()
                 if imageMetadata.find_empty_tags():
                     missing_tags[filepath] = imageMetadata.find_empty_tags()
                 

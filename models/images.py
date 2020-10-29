@@ -11,17 +11,22 @@ class ImagesModel(db.Model):
     filepath = db.Column(db.String(255))
     country = db.Column(db.String(255))#, db.ForeignKey('country_centre.name'))
     city = db.Column(db.String(255))
-    trip_id = db.Column(db.String(255))#, db.ForeignKey('trips.trip_id', ondelete="CASCADE"))
+    trip_id = db.Column(db.String(255))
     lattitude = db.Column(db.Float(precision=3))
     longitude = db.Column(db.Float(precision=3))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    marker_id = db.Column(db.String(100), db.ForeignKey('markers.id'))
-    user_id = db.Column(db.Integer)#,db.ForeignKey('trips.user_id', ondelete="CASCADE"))#, db.ForeignKey('users.id', ondelete="CASCADE")
+    marker_id = db.Column(db.String(100))
+    user_id = db.Column(db.Integer)#, db.ForeignKey('users.id', ondelete="CASCADE")
     # countries = db.relationship("CountryModel")
+
     markers = db.relationship("MarkerModel")
     trips = db.relationship("TripsModel")#, cascade="all, delete", backref="children")
-    users = db.relationship("UserModel")#, cascade="all, delete", backref="children")
-    __table_args__ = (db.ForeignKeyConstraint(['user_id', 'trip_id'],['trips.user_id', 'trips.trip_id']), db.ForeignKeyConstraint(['user_id'],['users.id']))
+
+    #users = db.relationship("UserModel", foreign_keys=[user_id])#, cascade="all, delete", backref="children")
+
+    __table_args__ = db.ForeignKeyConstraint(['user_id', 'trip_id'],['trips.user_id', 'trips.trip_id']),  db.ForeignKeyConstraint(['marker_id'],['markers.id'])#, db.ForeignKeyConstraint(['user_id'],['users.id']))
+    
+    
     def __init__(self, user_id, image_id, filepath, country, city, trip_id, lattitude, longitude, timestamp, marker_id):
         self.image_id = image_id
         self.filepath = filepath
@@ -56,11 +61,20 @@ class ImagesModel(db.Model):
         imgs = cls.find_images(trip_id, user_id)
         return [img.split('.')[0] + '_thumbnail.' + img.split('.')[1] for img in imgs]
 
-
+   
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
 
+    # to test
     def delete(self):
-        db.session.delete(self)
-        db.session.commit()
+        filepath = self.filepath
+        try:
+            db.session.delete(self)
+            os.remove(filepath)
+        except:                  
+            db.session.rollback()
+            raise
+        else:
+            db.session.commit()
+            

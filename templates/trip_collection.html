@@ -18,16 +18,44 @@
 {{ super() }}
 {% endblock %}
 {% block bodybottom %}
-
-<div class="gallery">
-    {% for image in images %}
-    <div class="gallery-cell">
-        <!-- <img src="/static/uploads/{{user_id}}/{{trip_id}}/{{image}}" alt=""> -->
-        <img id="{{image}}" src="{{ url_for('imageretrieve', user_id=user_id, filename=image) }}" onclick="toggleImage('{{image}}','{{user_id}}');" alt="">
-        <!-- <p>{{ image }}</p> -->
+<main role="main">
+    <section class="jumbotron text-center">
+        <div class="container">
+            <h1>{{trip_id}}</h1>
+            <p class="lead text-muted">{{description}}</p>
+            <p>
+                <a href="/home/trips/{{user_id}}" class="btn btn-primary my-2">Map view</a>
+                <a href="/home/upload/{{user_id}}?trip_id={{trip_id}}" class="btn btn-secondary my-2">Update</a>
+            </p>        
+        </div>
+    </section>
+    <div class="gallery">
+        {% for image in images %}
+        <div class="gallery-cell">
+            <!-- <img src="/static/uploads/{{user_id}}/{{trip_id}}/{{image}}" alt=""> -->
+            <!-- <img id="{{image}}" src="{{ url_for('imageretrieve', user_id=user_id, filename=image) }}" onclick="toggleImage('{{image}}','{{user_id}}');" alt=""> -->
+            <img id="{{image}}" src="{{ url_for('imageretrieve', user_id=user_id, filename=image) }}" onclick="openModal();currentSlide('{{ loop.index0 + 1}}')" alt="">
+            <!-- <p>{{ image }}</p> -->
+        </div>
+        {%endfor%}
     </div>
-    {%endfor%}
-</div>
+    <div id="myModal" class="modal">
+        <span class="close cursor" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            {% for image in images %}
+            <div class="mySlides">
+                <div class="numbertext">{{ loop.index0 + 1}} / {{images | length}}</div>
+                <img class="fullimage" src="{{ url_for('imageretrieve', user_id=user_id, filename=image.split('_thumbnail')[0] + '.' + image.split('_thumbnail')[1].split('.')[1]) }}" style="max-height:70vh;">
+            </div>
+            {%endfor%}
+                <!-- Next/previous controls -->
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        </div>
+    </div>
+    
+
+</main>
 <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
 <script src="{{ url_for('static', filename='get_trip_images.js') }}"></script> 
 {% endblock %}

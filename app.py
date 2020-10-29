@@ -4,7 +4,7 @@ from flask_jwt_extended import JWTManager
 from flask_script import Manager
 from resources.user import AllUsers, SecretResource, TokenRefresh, TokenRemove, UserHome,UserLogin, UserRegistration, ConfirmRegistration, UnconfirmedRegistration
 from resources.images import ImageSummary, ImageUpload, ImageCollection, ImageRetrieve
-from resources.trips import NewTrip
+from resources.trips import NewTrip, Trips
 from models.trips import TripsModel
 from models.markers import MarkerModel
 from models.images import ImagesModel
@@ -21,7 +21,7 @@ jwt = JWTManager(app)
 
 @app.before_first_request
 def create_tables():
-    db.drop_all()
+    #db.drop_all()
     db.create_all()
 
     user = UserModel(
@@ -109,6 +109,7 @@ api.add_resource(ImageSummary,'/home/photos/<user_id>')
 api.add_resource(ImageCollection,'/home/photos/<user_id>/<trip_id>')
 api.add_resource(ImageUpload, '/home/upload/<user_id>')
 api.add_resource(NewTrip, '/home/trips/<user_id>/addtrip')
+api.add_resource(Trips, '/home/trips/<user_id>')
 
 
 if __name__ == "__main__":

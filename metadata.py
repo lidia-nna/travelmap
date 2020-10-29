@@ -5,6 +5,12 @@ from PIL.ExifTags import TAGS, GPSTAGS
 class MetadataExtractor:
 
     def __init__(self, filepath):
+        self.GpsTagNames = {
+            'GPSLatitudeRef': None,
+            'GPSLongitudeRef': None,
+            'GPSLatitude': None,
+            'GPSLongitude': None
+        }    
         self.filepath = filepath
         self.filename = os.path.basename(filepath)
         self.orientation = None
@@ -15,8 +21,8 @@ class MetadataExtractor:
         self.lng = None
         self.format = None
         self.size = None
-        self.lat_ref = None
-        self.lng_ref = None
+        # self.lat_ref = self.GpsTagNames['GPSLatitudeRef']
+        # self.lng_ref = self.GpsTagNames['GPSLongitudeRef']
         self.geo_data = {
             'timestamp': self.timestamp,
             'country': self.country,
@@ -24,16 +30,12 @@ class MetadataExtractor:
             'lat': self.lat,
             'lng': self.lng
         }
-        self.GpsTagNames = {
-            'GPSLatitudeRef': self.lat_ref,
-            'GPSLongitudeRef': self.lng_ref,
-            'GPSLatitude': self.lat,
-            'GPSLongitude': self.lng
-        }        
+            
     def lookupGpsTag(self, gpsInfo):
         for gk in gpsInfo.keys():
             if GPSTAGS[gk] in self.GpsTagNames.keys():
                 self.GpsTagNames[GPSTAGS[gk]] = gpsInfo[gk]
+                
 
 
     def extract(self):
@@ -55,7 +57,6 @@ class MetadataExtractor:
                         self.orientation = exif[k]
                     elif TAGS[k] == "GPSInfo":
                         self.lookupGpsTag(exif[k])
-                        print(self.GpsTagNames)
                         #     exit(0)
                         #     print('found GPS info')
                         #     for gk in exif[k].keys():
@@ -74,8 +75,8 @@ class MetadataExtractor:
         except AttributeError as e:
             return "Unknown type: e"
         try:
-            self.lat = self.convert_to_decimal_deg(self.lat, self.lat_ref)
-            self.lng = self.convert_to_decimal_deg(self.lng, self.lng_ref)
+            self.lat = self.convert_to_decimal_deg(self.GpsTagNames['GPSLatitude'], self.GpsTagNames['GPSLatitudeRef'])
+            self.lng = self.convert_to_decimal_deg(self.GpsTagNames['GPSLongitude'], self.GpsTagNames['GPSLongitudeRef'])
             self.city, self.country = self.find_location()
         except Exception:
             pass
@@ -114,7 +115,7 @@ class MetadataExtractor:
 
 
     def print_me(self):
-        print('filepath: {}\nfilename: {}\norientation: {}\ntimestamp: {}\ncountry: {}\ncity: {}\nlat: {}\nlng: {}\nformat: {}\nsize: {}\nlat_ref: {}\nlng_ref: {}\n'.format(
+        print('filepath: {}\nfilename: {}\norientation: {}\ntimestamp: {}\ncountry: {}\ncity: {}\nlat: {}\nlng: {}\nformat: {}\nsize: {}\n'.format(
             self.filepath,
             self.filename,
             self.orientation,
@@ -124,9 +125,7 @@ class MetadataExtractor:
             self.lat,
             self.lng,
             self.format,
-            self.size,
-            self.lat_ref,
-            self.lng_ref
+            self.size
         ))
 
 

@@ -1,0 +1,59 @@
+{% extends "template.html" %}
+
+{% block description%}
+<meta name="description" content="Test">
+{% endblock %}
+
+{% block author %} {{super()}} {% endblock %}
+
+{% block title %} Trips on map {% endblock %}
+
+{% block customstyle%}
+<link rel="stylesheet" href="{{url_for('static', filename='css/album.css')}}">
+<style>
+    .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block home %}
+{{ url_for('userhome', user_id=user_id) }}
+{% endblock %}
+{% block nav %}
+{{ super() }}
+{% endblock %}
+{% block bodybottom %}
+<main role="main">
+    <section class="jumbotron text-center">
+        <div class="container">
+            <h1>Trips on map</h1>
+            <p class="lead text-muted">Live your life by a compass, not a clock</p>
+        </div>
+    </section>
+
+    <div id="map" style="height:50%"></div>
+</main>
+<script>
+    var markers = {{ markers|tojson }};
+</script>
+<script type="text/javascript" src="{{ url_for('static', filename='jwt-vanilla.js')}}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='trips.js')}}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZTMjDgOFNnaYJREz7vAauJ6rUN2od6Ow&callback=initMap" async defer></script>
+<!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../assets/js/vendor/jquery.slim.min.js"><\/script>')</script>
+    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script> -->
+{% endblock %}

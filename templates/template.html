@@ -43,9 +43,9 @@
                         Trips
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url_for('newtrip', user_id=user_id )}}">Add a trip</a>
+                        <a class="dropdown-item"  href="{{ url_for('trips', user_id=user_id )}}">View</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="upload">Upload photos</a>
+                        <a class="dropdown-item" href="{{ url_for('newtrip', user_id=user_id )}}">Add</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -56,7 +56,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ url_for('imagesummary', user_id=user_id )}}">The Photo Collection</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{ url_for('imageupload', user_id=user_id )}}">Upload photos</a>
+                        <a class="dropdown-item" href="{{ url_for('imageupload', user_id=user_id )}}">Upload</a>
                     </div>
                 </li>
             </ul>

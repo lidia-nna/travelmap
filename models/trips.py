@@ -68,13 +68,31 @@ class TripsModel(db.Model):
         return cls.query.filter_by(trip_id=trip_id).filter_by(user_id=user_id).first()
 
     @classmethod
-    def find_all(cls, user):
+    def find_all(cls, user_id):
         #with user
-        query = db.session.query(ImagesModel.user_id, cls).join(ImagesModel.trip_id==cls.trip_id).filter(ImagesModel.user_id==user)
+        query = db.session.query(ImagesModel.user_id, cls).join(ImagesModel.trip_id==cls.trip_id)#.filter(cls.user_id==user)
         # without user
         # query = cls.query.all()
         if len(query) != 0:
             return query
+
+
+    @classmethod
+    def find_coordinates(cls, user_id):
+        query = db.session.query(
+            cls.marker_colour, 
+            ImagesModel.filepath, 
+            ImagesModel.lattitude, 
+            ImagesModel.longitude).join(ImagesModel, (ImagesModel.trip_id==cls.trip_id) & (ImagesModel.user_id==cls.user_id)).filter(cls.user_id == user_id)
+        return [
+            {
+                'lat': row.lattitude,
+                'lng': row.longitude,
+                'filepath': row.filepath,
+                'colour': row.marker_colour
+            }
+            for row in query
+        ]
 
     def save_to_db(self):
         db.session.add(self)

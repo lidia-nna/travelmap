@@ -8,6 +8,17 @@ const map = new google.maps.Map(document.getElementById('map'), {
     mapTypeId: 'hybrid',
     disableDefaultUI: true
 });
+
+const getPin = (colour) => {
+    return {
+        path:"",
+        fillColor: colour,
+        fillOpacity: 0.8,
+        scale: 0.5,
+        strokeColor: "black",
+        strokeWeight: 5,
+    }   
+};
 // setMarkers(map);
 // }
 

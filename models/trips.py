@@ -93,6 +93,9 @@ class TripsModel(db.Model):
             }
             for row in query
         ]
+    @classmethod
+    def find_trip_colours(cls, user_id):
+        return db.session.query(cls.trip_id, cls.marker_colour).filter_by(user_id=user_id).all()
 
     def save_to_db(self):
         db.session.add(self)

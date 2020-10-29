@@ -1,5 +1,6 @@
 var map;
 var markers;
+var trips;
 
 function initMap() {
     const map = new google.maps.Map(document.getElementById('map'), {
@@ -18,7 +19,7 @@ function initMap() {
             fillOpacity: 0.8,
             scale: 0.5,
             strokeColor: "black",
-            strokeWeight: 2,
+            strokeWeight: 1,
             anchor: new google.maps.Point(0, 55)
         }
     };
@@ -49,5 +50,35 @@ function initMap() {
                 });
             bounds.extend(position);
         });
-        map.fitBounds(bounds);
+
+    const legend = document.getElementById("legend");
+    console.log('trips:', trips)
+    trips.forEach((trip) => {
+        let icon = getPin(colour=trip[1]);
+        const name = trip[0];
+        const rowItem = document.createElement('div')
+        rowItem.setAttribute('class', 'rowItem')
+        const svgNS = "http://www.w3.org/2000/svg"; 
+        let svg = document.createElementNS(svgNS, "svg");
+        svg.setAttributeNS(null, "height","30");
+        svg.setAttributeNS(null,"width", "30");
+        // el.setAttributeNS('xmlns', 'http://www.w3.org/2000/svg')
+        let pathSVG = document.createElementNS(svgNS,"path");
+        pathSVG.setAttributeNS(null,"d", icon.path) ;
+        pathSVG.setAttributeNS(null,"fill", icon.fillColor);
+        pathSVG.setAttributeNS(null,"stroke", icon.strokeColor);
+        pathSVG.setAttributeNS(null,"stroke-width", icon.strokeWeight);
+        pathSVG.setAttributeNS(null,"scale", 0.5);
+        let tripId = document.createElement('span')
+        tripId.setAttribute('class', 'tripId')
+        tripId.innerHTML = trip[0]
+        svg.appendChild(pathSVG);
+        rowItem.appendChild(svg)
+        rowItem.appendChild(tripId)
+        legend.appendChild(rowItem);  
+    }) 
+       
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+
+    map.fitBounds(bounds);
 }

@@ -9,7 +9,7 @@
 {% block title %} Trips on map {% endblock %}
 
 {% block customstyle%}
-<link rel="stylesheet" href="{{url_for('static', filename='css/album.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/trips.css')}}">
 <style>
     .bd-placeholder-img {
         font-size: 1.125rem;
@@ -43,10 +43,12 @@
         </div>
     </section>
 
-    <div id="map" style="height:50%"></div>
+    <div id="map" style="height:70%"></div>
+    <div id="legend"><h5>Legend</h5></div>
 </main>
 <script>
     var markers = {{ markers|tojson }};
+    var trips = {{ trips|tojson}};
 </script>
 <script type="text/javascript" src="{{ url_for('static', filename='jwt-vanilla.js')}}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='trips.js')}}"></script>

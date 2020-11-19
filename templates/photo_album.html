@@ -50,8 +50,8 @@
                     
                 <div class="col-md-4">
                     <!-- href="{{ url_for('imagecollection', user_id=user_id, trip_id=trip_id) }}" -->
-                    <a href="{{ url_for('imagecollection', user_id=user_id, trip_id=trip_id) }}">
-                        <div class="card mb-4 box-shadow">
+                    <!-- <a href="{{ url_for('imagecollection', user_id=user_id, trip_id=trip_id) }}"> -->
+                        <div class="card mb-4 box-shadow" onclick="getImages(trip_id='{{trip_id}}', user_id='{{user_id}}')">
                             <!-- <img class="card-img-top" src="/static/uploads/{{user_id}}/IMG_2809_thumbnail.JPG" alt="Card image cap"> -->
                             {% if front_image == "blank_page.png" %}
                                 <img class="card-img-top" src="{{ url_for('static', filename=front_image) }}" alt="Card image cap"> 

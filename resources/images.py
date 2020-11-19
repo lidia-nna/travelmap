@@ -8,16 +8,15 @@ from flask_jwt_extended import jwt_required
 from flask.helpers import send_from_directory, url_for
 import os
 import werkzeug
-from metadata import MetadataExtractor
+from metadata import MetadataExtractor, ReverseGeocoding
 from thumbnail import SquaredThumbnail
 
 global UPLOAD_FOLDER
-UPLOAD_FOLDER = os.path.join( os.getcwd(), 'photos')
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
 
 class ImageRetrieve(Resource):
     def get(self, user_id, filename):
         return send_from_directory(os.path.join(UPLOAD_FOLDER, user_id), filename)
-
 class ImageSummary(Resource):
     # @jwt_required
     def get(self, user_id):
@@ -27,7 +26,8 @@ class ImageSummary(Resource):
         for trip in trips:
             # no images in trip
             if ImagesModel.find_thumbnails(trip_id=trip, user_id=user_id):
-                front_image = ImagesModel.find_thumbnails(
+                #print(ImagesModel.find_thumbnails(trip_id=trip, user_id=user_id))
+                _ , front_image = ImagesModel.find_thumbnails(
                 trip_id=trip, user_id=user_id)[0]
             else:
                 front_image = "blank_page.png"
@@ -68,6 +68,38 @@ class ImageUpload(Resource):
         return make_response(
             render_template('upload.html', user_id=user_id, trip_id = data.trip_id, trips=TripsModel.find_trip_list(user_id=user_id)), 200, headers)
 
+    @staticmethod
+    def set_city(x):
+        try:
+            city = x[0]
+        except IndexError:
+            pass
+        else:
+            if len(x)> 1:
+                city = ", ".join(x)
+            return city
+
+    def get_geolocation(self, lat, lng):
+        try:
+            gmaps = ReverseGeocoding(lat, lng)
+            gmaps.find_locations()
+        except RuntimeError as e:
+            raise TypeError('Googlemaps API exception, no results restrieved') from e
+        if gmaps.get_country():
+            country = gmaps.get_country()[0]
+        geodata = [
+            gmaps.get_city(), 
+            gmaps.get_area_level1(), 
+            gmaps.get_area_level2()
+        ]
+        for loc in geodata:
+            if self.set_city(loc):
+                return self.set_city(loc), country
+
+    def make_thumbnail(self, *args, **kwargs):
+        thumb=SquaredThumbnail(*args, **kwargs)
+        thumb.gen_thumbnail()
+        thumb.crop_thumbnail()    
 
     # @jwt_required
     def post(self, user_id):
@@ -77,45 +109,42 @@ class ImageUpload(Resource):
             type=werkzeug.datastructures.FileStorage, 
             location='files', 
             action='append')
-        parser.add_argument('trip_id', location='form')
+        parser.add_argument(
+            'trip_id', 
+            location='form')
         data = parser.parse_args()
         # try if not data['files']:
-        if data['files'] == "" or data['files'] == []:
+        if not data['files']:
             return redirect(request.url)
         photos = data['files']
         trip_id = data['trip_id']
-        # filenames = data['filenames[]']
-        # record files with missing geodata
         missing_tags = {}
-        # r' in split expression acts as raw literal
-        # filename = re.split(r'\\|/|//', filename)[-1]
-        # names = [photo.filename for photo in photos]
-        # assert len(names) == len(filenames)
         upload_dir = os.path.join(UPLOAD_FOLDER, user_id)
-        print(f'upload_dir: {upload_dir}')
         if not os.path.isdir(upload_dir):
             os.makedirs(upload_dir)
         for i, photo in enumerate(photos):
             filepath = os.path.join(upload_dir, photo.filename)
             photo.save(filepath)
-            print(f'filepath: {filepath}')
             try:
                 imageMetadata = MetadataExtractor(filepath)
                 imageMetadata.extract()
-                imageMetadata.print_me()
-                if imageMetadata.find_empty_tags():
-                    missing_tags[filepath] = imageMetadata.find_empty_tags()
-                
             except Exception as e:
-                print(str(e))
-                raise str(e)     
-            thumb=SquaredThumbnail(
-                filepath = filepath, 
-                new_side = 400,
-                orientation = imageMetadata.orientation
-                )
-            thumb.gen_thumbnail()
-            thumb.crop_thumbnail()           
+                # TODO case with no/wrong GPS data, extract info about countries
+                print('No GPS data')
+            else:
+                lat = imageMetadata.lat
+                lng = imageMetadata.lng
+                if lat is not None and lng is not None:
+                    # should city, country be part of imageMetadata class if not set by the instance method
+                    try:
+                        imageMetadata.city, imageMetadata.country = self.get_geolocation(lat, lng)
+                    #catch googlemaps API fuilure
+                    except TypeError as e:
+                        raise RuntimeWarning('Googlemaps API failure no geolocation results retrieved!') from e
+                    
+            finally:
+                missing_tags[filepath] = imageMetadata.find_empty_tags() 
+            # crete ORM image record       
             newImage = ImagesModel(
                 image_id = None,
                 filepath = filepath,
@@ -128,23 +157,50 @@ class ImageUpload(Resource):
                 marker_id = None,
                 user_id = user_id
             )
-            newImage.save_to_db()
+            print(vars(newImage))
+            # save record to db
+            try:
+                newImage.save_to_db()
+            except Exception as e:
+                print('Postgres Error while saving image data' + str(e))
+                os.remove(filepath)
+                flash('Upload failed!', 'failure')
+                return redirect(url_for('imageupload', user_id=user_id, trips=TripsModel.find_trip_list(user_id=user_id)))    
+            else:
+                # generate thumbnail
+                self.make_thumbnail(
+                filepath = filepath, 
+                new_side = 400,
+                orientation = imageMetadata.orientation
+                )
 
         print(f'----------Missing_tags----------------------: {missing_tags}')
         flash('Files successfully uploaded!', 'success')
             # return redirect('/')
-        return redirect(url_for('imageupload', user_id=user_id, trips=TripsModel.find_trip_list(user_id=user_id)))
-        # return [
-        #     11,
-        #     filepath,
-        #     imageMetadata.country,
-        #     imageMetadata.city,
-        #     trip_id,
-        #     imageMetadata.lat,
-        #     imageMetadata.lng,
-        #     imageMetadata.timestamp,
-        #     None,
-        #     user_id
-        # ]
-        #return {'message': 'Could not find the image'}, 400
-        # return redirect(request.url)
+        return redirect(url_for('imageupload', user_id=user_id, trips=TripsModel.find_trip_list(user_id=user_id)))    
+
+    def delete(self, user_id):
+        parser = reqparse.RequestParser()
+        parser.add_argument(
+        'image_id', 
+        type=int # trip_id set to None for cases when upload is done to an existing trip (using trips parameter) as opposed to just added one (trip_id)
+    )
+        data = parser.parse_args()
+        print(data)
+        headers = {'Content-Type': 'text/html'}
+        image = ImagesModel.find_by_id(data.image_id)
+        # change delete method
+        try:
+            ImagesModel.delete(image)
+        except OSError as e:
+            print(f'Image does not exist --- {e}')
+            return {'message': 'Removal unsuccessul'}
+        except IOError as e: 
+            print(f'No permissions to remove the image --- {e}')
+            return {'message': 'Removal unsuccessul'}
+        else:
+            return {'message': 'Image removed'}
+        
+
+
+        

@@ -29,9 +29,30 @@ function initMap() {
         const pins = markers
         const bounds = new google.maps.LatLngBounds();
         pins.forEach(pin => {
-            let lat_c = pin.lat;
-            let lng_c = pin.lng;
-            let position = { lat: parseFloat(lat_c), lng: parseFloat(lng_c) };
+            // pin.lat/pin.lng equal to NaN or undifined or [] or "" would allow belot to run
+            if ( pin.lat !== null & pin.lng !== null ) {
+                let lat_c = pin.lat;
+                let lng_c = pin.lng;
+                let position = { lat: parseFloat(lat_c), lng: parseFloat(lng_c) };
+
+                const infowindow = new google.maps.InfoWindow({
+                    content: `<img style="width: 100%; border-radious: 1px; border-color: black;" src="/photos/${user_id}/${pin.filename}" onclick="window.location.href">
+                    <span>${pin.city}</span>`,
+                });
+                const marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: pin.name,
+                    icon: getPin(pin.colour),
+                    animation: google.maps.Animation.DROP
+                    });
+                marker.addListener("click", () => {
+                    infowindow.open(map, marker);
+                    });
+                bounds.extend(position);
+            }
+        });
+    
     //         var image = {
     //           url: pin.icon_uri,
     //           // This marker is 20 pixels wide by 32 pixels high.
@@ -41,15 +62,9 @@ function initMap() {
     //           // The anchor for this image is the base of the flagpole at (0, 32).
     //           anchor: new google.maps.Point(1, 22)
     //         };
-            const marker = new google.maps.Marker({
-                position: position,
-                map: map,
-                title: pin.name,
-                icon: getPin(pin.colour),
-                animation: google.maps.Animation.DROP
-                });
-            bounds.extend(position);
-        });
+            
+
+        
 
     const legend = document.getElementById("legend");
     console.log('trips:', trips)

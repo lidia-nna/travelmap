@@ -1,6 +1,7 @@
 from db import db
 from models.images import ImagesModel
 from models.markers import MarkerModel
+import os
 
 
 class TripsModel(db.Model):
@@ -14,7 +15,7 @@ class TripsModel(db.Model):
     marker_id = db.Column(db.String(100), db.ForeignKey('markers.id'))
     countries = db.Column(db.PickleType)
     markers = db.relationship("MarkerModel")
-    images = db.relationship("ImagesModel")
+    images = db.relationship("ImagesModel", cascade="all, delete", backref="children")
     users = db.relationship("UserModel")#, cascade="all, delete", backref="children")
     
     def __init__(self, user_id, trip_id, description, marker_colour, marker_id, countries):
@@ -76,20 +77,22 @@ class TripsModel(db.Model):
         if len(query) != 0:
             return query
 
-
+    #PASS On just a filename instead of filepath
     @classmethod
     def find_coordinates(cls, user_id):
         query = db.session.query(
             cls.marker_colour, 
             ImagesModel.filepath, 
             ImagesModel.lattitude, 
-            ImagesModel.longitude).join(ImagesModel, (ImagesModel.trip_id==cls.trip_id) & (ImagesModel.user_id==cls.user_id)).filter(cls.user_id == user_id)
+            ImagesModel.longitude,
+            ImagesModel.city).join(ImagesModel, (ImagesModel.trip_id==cls.trip_id) & (ImagesModel.user_id==cls.user_id)).filter(cls.user_id == user_id)
         return [
             {
                 'lat': row.lattitude,
                 'lng': row.longitude,
-                'filepath': row.filepath,
-                'colour': row.marker_colour
+                'filename': os.path.basename(row.filepath).split('.')[0] + '_thumbnail.' + os.path.basename(row.filepath).split('.')[1],
+                'colour': row.marker_colour,
+                'city': row.city
             }
             for row in query
         ]
@@ -101,7 +104,16 @@ class TripsModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
+    # def delete(self):
+    #     db.session.delete(self)
+    #     db.session.commit()
+    @classmethod
+    def delete(cls, record):
+        try:
+            db.session.delete(record)
+        except:                  
+            db.session.rollback()
+            raise
+        else:
+            db.session.commit()
 

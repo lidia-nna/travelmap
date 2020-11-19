@@ -11,6 +11,9 @@ from pathlib import Path
 from string import Template
 from emailtoken import Token, Email
 from flask.helpers import url_for
+from models.images import ImagesModel
+import os
+import warnings
 parser = reqparse.RequestParser()
 parser.add_argument(
     'email',
@@ -24,6 +27,7 @@ parser.add_argument(
     required=True
 )
 
+
 emailparser = reqparse.RequestParser()
 emailparser.add_argument(
     'email',
@@ -32,10 +36,19 @@ emailparser.add_argument(
 )
 
 
+update_parser = reqparse.RequestParser()
+update_parser.add_argument('email')
+
+update_parser.add_argument('password')
+
+update_parser.add_argument('username')
+
+
 class UserHome(Resource):
     @jwt_required
     def get(self, user_id):
-        return make_response(render_template('home.html', user_id=user_id), 200, {'Content-Type': 'text/html'})
+        api_key = os.environ.get('GM_API_KEY')
+        return make_response(render_template('home.html', user_id=user_id, key=api_key), 200, {'Content-Type': 'text/html'})
 
 
 class UserLogin(Resource):
@@ -80,54 +93,117 @@ class UserRegistration(Resource):
             return redirect('/unconfirmed')
         # if UserModel.check_user(username=data.username):
         #     return {'message': 'this username already exists, please select a different name'}
-
-        token = Token()
-        mytoken = token.generate_confirmation_token(email=data.email)
-        # email = EmailMessage()
-        # email['from'] = 'Travelmap'
-        # email['to'] = data.email
-        # email['subject'] = "Travelmap account registration"
-        # email.set_content(f"Thank you for registaring with travelmap. Please confirm your details by clicking in the below link:\n http://127.0.0.1:5500/confirmreg/{mytoken}")
-        # with smtplib.SMTP(host='smtp.gmail.com', port=587) as smtp:
-        #     smtp.ehlo()
-        #     smtp.starttls()
-        #     smtp.login('play.python.test@gmail.com', 'Test123#')
-        #     smtp.send_message(email)
-        #     print('Sent!')
-
-        confemail = Email()
-        confirm_url= f'http://127.0.0.1:5000/confirmreg/{mytoken}'
-        confemail.send_email(
-            subject="Travelmap account registration", 
-            to=data.email, 
-            template=render_template("email_template.html", confirm_url=confirm_url))
-
+        self.confirm_email(
+            email=data.email,
+            subject="Travelmap account registration",
+            template="email_template.html"
+        )
         user = UserModel(email=data.email)
         user.set_password(data.password)
         user.set_username()
 
         try:
             user.save_to_db()
-            # access_token = create_access_token(identity=user.username)
-            # refresh_token = create_refresh_token(identity=user.username)
             flash('A confirmation email has been sent via email.', 'success')
-            # set_refresh_cookies(resp, refresh_token)
-            # set_access_cookies(resp, access_token)
             return redirect('/register')
         except Exception as e:
             return {'message': f'Something went wrong: {e}'}, 400
+    
 
-     # update password or email       
+    def confirm_email(self, email, subject, template):
+        token = Token()
+        mytoken = token.generate_confirmation_token(email=email)
+        confemail = Email()
+        #url = url_for("confirmregistration", token=mytoken)
+        url= f'http://127.0.0.1:5000/confirmreg/{mytoken}'
+        confemail.send_email(
+            subject=subject, 
+            to=email, 
+            template=render_template(template, confirm_url=url))
+
+
+
+    # def retrieve_user_data(self):
+    #     user_id = get_jwt_identity()
+    #     user = UserModel.find_user(user_id)
+    #     new_user = UserModel(
+    #         id = user.id,
+    #         email = user.email,
+    #         password_hash = user.password_hash,
+    #         confirmed = user.confirmed,
+    #         confirmed_on = user.confirmed_on,
+    #         registered_on = user.registared_on,
+    #         user = user.username
+    #     )
+    #     return new_user
+
+     # update password/email/username
+    #@jwt_required     
     def put(self):
-        pass
+        request_args = update_parser.parse_args()
+        # username = get_jwt_identity()
+        username = 'Anna'
+        try:
+            UserModel.update_to_db(username, **request_args)
+            if request_args.email:
+                send_confirmation = {
+                    'email' : request_args.email, 
+                    'subject' : "Travelmap email update confirmation",
+                    'template' : "email_template_2.html"
+                }
+                self.confirm_email(**send_confirmation)
+        except Exception as e:
+            return {"message": str(e)}
+        return "Update successful"
+ 
 
     #remove the profile
     def delete(self):
-        pass
+        #username = get_jwt_identity()
+        username = "lid.mijas"
+        user = UserModel.find_user(username)
+        print(user.id)
+        images= ImagesModel.find_by_user(user.id)
+        if images:
+            record = images[0]
+            image_dir = os.path.abspath(os.path.dirname(record.filepath))
+        try:
+            user.delete()
+        except Exception as e:
+            print('Failed to remove the user record' +str(e))
+            return "Removal unsuccessful"
+        else:
+            # for image in images:
+            #     try:
+            #         ImagesModel.delete_files(image)
+            #     except OSError as e:
+            #         warnings.warn("Couldn't remove the image, image does not exist:" + str(e)) 
+            #     except IOError as e:
+            #          warnings.warn('No permissions to remove the image:'+str(e))
+            #     else:
+            #         print(f'Image {image} removed')
+
+            try:
+                os.remove(image_dir)
+            except Exception as e:
+                warnings.warn('data not removed:' + str(e))
+                return "Removal partially successful"
+            else:
+                filepaths = (image.filepath for image in images)
+                is_data_removed = (os.path.exists(filepath) for filepath in filepaths)
+                if sum(is_data_removed) > 0:
+                    return "Removal partially successful"
+        return "Removal successful"
+        
+
+    
+
 class UnconfirmedRegistration(Resource):
     def get(self):
         return make_response(render_template('unconfirmed.html'), 200)
+
     def post(self):
+
         data = emailparser.parse_args()
         user = UserModel.check_user(email=data.email) 
         if user and not user.confirmed:

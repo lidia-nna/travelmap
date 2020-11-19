@@ -14,11 +14,12 @@ class UserModel(db.Model):
     registered_on = db.Column(db.DateTime, nullable=False)
     confirmed = db.Column(db.Boolean, nullable=False, default = False)
     confirmed_on = db.Column(db.DateTime, nullable=True)
-    trips = db.relationship("TripsModel", passive_deletes="all", backref="parent")
-    #images = db.relationship("ImagesModel", passive_deletes="all", backref="parent")
+    # passive_deletes=all instead of cascade="all,delete" did not work
+    trips = db.relationship("TripsModel", cascade="all, delete", backref="parent")
 
-    def __init__(self, email, confirmed=False, registered_on=None, confirmed_on=None):
-        # self.id = id
+
+    def __init__(self, email, id = None, confirmed=False, registered_on=None, confirmed_on=None):
+        self.id = id
         self.email = email
         self.username = email.split('@')[0]
         self.passwd_hash = None
@@ -66,6 +67,26 @@ class UserModel(db.Model):
     def find_user_id(cls, username):
         user_record = cls.query.filter_by(username=username).first()
         return user_record.id
+
+    @classmethod
+    def find_user(cls, username):
+        print (type(cls.query.filter_by(username=username).first()))
+        return cls.query.filter_by(username=username).first()
+
+    @classmethod
+    def update_to_db(cls, *args, email = None, password = None, username = None):
+        user = cls.find_user(*args)
+        if email:
+            user.email = email
+            user.confirmed = False
+            user.confirmed_on = None
+        elif password:
+            user.passwd_hash = generate_password_hash(password)
+        elif username:
+            user.username = username
+        db.session.commit()
+
+        
 
     def save_to_db(self):
         db.session.add(self)

@@ -1,10 +1,37 @@
-const getImages = (trip_id, user_id) => {
+// let trip_id;
+// let user_id;
+
+// const cards = document.querySelectorAll('.card');
+
+// cards.forEach(card => { 
+//   card.addEventListener('click', function(e, trip_id, user_id) {
+//     if (this === e.target){
+//       getImages(trip_id, user_id)
+//     }
+//   })
+  
+// });
+// $('.card > .bin-holder').click(function(e){ e.stopPropagation(); });
+
+const getImages = (tid, uid) => {
     try {
-        window.location.href=`http://127.0.0.1:5000/photos/${user_id}/${trip_id}`
+        window.location.href=`/home/photos/${user_id}/${trip_id}`;
     } catch (error) {
-        error => `Error ${error.status}: ${error.textContent}` 
+        error => `Error ${error.status}: ${error.textContent}`; 
     }   
-}
+};
+
+
+const deleteTrip = async (user_id, trip_id ) => {
+  let request = await fetch(`/home/trips/${user_id}?trip_id=${trip_id}`, {
+    method: 'delete'
+  })
+  response = await request.json();
+  if (request.status != 200) {
+      console.log(response)
+  } else {
+  window.location.reload()
+  }}
 
 // const toggleImage = (thumbnail, user_id) => {
 //     const imageEl = document.getElementById(thumbnail)
@@ -65,3 +92,14 @@ function showSlides(n) {
 }
 
 
+
+const deleteData = async (user_id, image_id ) => {
+  let request = await fetch(`/home/upload/${user_id}?image_id=${image_id}`, {
+    method: 'delete'
+  })
+  response = await request.json();
+  if (request.status != 200) {
+      console.log(response)
+  } else {
+  window.location.reload()
+  }}

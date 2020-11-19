@@ -30,22 +30,24 @@
         </div>
     </section>
     <div class="gallery">
-        {% for image in images %}
+        {% for id, filename in images %}
         <div class="gallery-cell">
             <!-- <img src="/static/uploads/{{user_id}}/{{trip_id}}/{{image}}" alt=""> -->
             <!-- <img id="{{image}}" src="{{ url_for('imageretrieve', user_id=user_id, filename=image) }}" onclick="toggleImage('{{image}}','{{user_id}}');" alt=""> -->
-            <img id="{{image}}" src="{{ url_for('imageretrieve', user_id=user_id, filename=image) }}" onclick="openModal();currentSlide('{{ loop.index0 + 1}}')" alt="">
-            <!-- <p>{{ image }}</p> -->
+            <img id="{{id}}" src="{{ url_for('imageretrieve', user_id=user_id, filename=filename) }}" onclick="openModal();currentSlide('{{ loop.index0 + 1}}')" alt="">
+            <img class="bin" src="/static/bin.png" alt="trash bin" onclick="deleteData(user_id='{{user_id}}', image_id = '{{id}}')">
+            <!-- <p>{{ filename }}</p> -->
         </div>
         {%endfor%}
     </div>
     <div id="myModal" class="modal">
         <span class="close cursor" onclick="closeModal()">&times;</span>
-        <div class="modal-content">
-            {% for image in images %}
+        <div class="modal-content"> 
+             
+            {% for id, filename in images %}
             <div class="mySlides">
                 <div class="numbertext">{{ loop.index0 + 1}} / {{images | length}}</div>
-                <img class="fullimage" src="{{ url_for('imageretrieve', user_id=user_id, filename=image.split('_thumbnail')[0] + '.' + image.split('_thumbnail')[1].split('.')[1]) }}" style="max-height:70vh;">
+                <img class="fullimage" src="{{ url_for('imageretrieve', user_id=user_id, filename=filename.split('_thumbnail')[0] + '.' + filename.split('_thumbnail')[1].split('.')[1]) }}" style="max-height:70vh;">
             </div>
             {%endfor%}
                 <!-- Next/previous controls -->

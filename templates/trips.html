@@ -44,15 +44,19 @@
     </section>
 
     <div id="map" style="height:70%"></div>
-    <div id="legend"><h5>Legend</h5></div>
+    <div id="legend">
+        <h5>Legend</h5>
+    </div>
 </main>
 <script>
-    var markers = {{ markers|tojson }};
-    var trips = {{ trips|tojson}};
+    var markers = {{ markers| tojson }};
+    var trips = {{ trips| tojson}};
+    var user_id = {{ user_id }}
 </script>
 <script type="text/javascript" src="{{ url_for('static', filename='jwt-vanilla.js')}}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='trips.js')}}"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZTMjDgOFNnaYJREz7vAauJ6rUN2od6Ow&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{key}}&callback=initMap" async
+    defer></script>
 <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
         crossorigin="anonymous"></script>

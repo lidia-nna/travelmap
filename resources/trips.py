@@ -7,14 +7,46 @@ import os
 
 class Trips(Resource):
 
+
+
     def get(self, user_id):
         return make_response(
             render_template(
                 'trips.html', 
                 user_id = user_id, 
                 markers = TripsModel.find_coordinates(user_id=user_id), 
-                trips = TripsModel.find_trip_colours(user_id=user_id)),
+                trips = TripsModel.find_trip_colours(user_id=user_id),
+                key = os.environ.get('GM_API_KEY')),
             200)
+
+    def delete(self, user_id):
+        parser = reqparse.RequestParser()
+        parser.add_argument(
+        'trip_id', 
+        type=str # trip_id set to None for cases when upload is done to an existing trip (using trips parameter) as opposed to just added one (trip_id)
+    )
+        data = parser.parse_args()
+        record = TripsModel.find_by_id(trip_id=data.trip_id, user_id=user_id)
+        images = ImagesModel.find_by_trip(trip_id=data.trip_id, user_id=user_id)
+        filepaths = (image.filepath for image in images)
+        
+        try:
+            TripsModel.delete(record)
+        except Exception as e:
+            print(f'Could not remove trip {data.trip_id}: {e}')
+            return {'message': 'Removal unsuccessul'}
+        else:
+            for filepath in filepaths:
+                try:
+                    ImagesModel.delete_files(filepath)
+                except OSError as e:
+                    raise RuntimeWarning(f'Image does not exist') from e
+                except IOError as e: 
+                    raise RuntimeWarning(f'No permissions to remove the image') from e
+                else:
+                    print(f'Image {filepath} removed!') 
+                    
+
 
 
 

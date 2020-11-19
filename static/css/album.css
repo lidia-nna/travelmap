@@ -26,6 +26,30 @@
 img, p {
   cursor: pointer;
 }
+
+
+.bin-holder{
+  position: absolute; 
+  top: 5;
+  right: 15;
+  width: 10%;
+  height: 20%;
+}
+
+.trash_bin {
+  display:none;
+}
+
+.bin-holder:hover .trash_bin {
+  position: absolute;
+  display: block;
+  top: 5;
+  right: 5;
+  width: 80%;
+  /* cursor:pointer; */
+}
+
+
 footer {
   padding-top: 3rem;
   padding-bottom: 3rem;

@@ -10,7 +10,7 @@
 
 
 {% block nav %}
-    {{ super() }}
+{{ super() }}
 {% endblock %}
 
 {% block bodybottom %}
@@ -20,7 +20,6 @@
 <div id="map" style="height:50%"></div>
 <script type="text/javascript" src="{{ url_for('static', filename='jwt-vanilla.js')}}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='main.js')}}"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZTMjDgOFNnaYJREz7vAauJ6rUN2od6Ow&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{key}}&callback=initMap" async
+    defer></script>
 {% endblock %}
-
-

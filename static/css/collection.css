@@ -19,21 +19,29 @@
 }
 
 
-
 .gallery-cell > img {
     
     position: absolute;
     top: 0;
-    left: 0;
+    right: 0;
     width:100%;
     margin:auto;
-    bottom:0;
-    right: 0;
+    /* bottom:0;
+    right: 0; */
     cursor: pointer;
-    
-    /* transition: all 0.3s ease-out; */
-    
-    
+    /* transition: all 0.3s ease-out; */  
+}
+
+
+.bin {    
+    display: none;
+}
+
+.gallery-cell:hover .bin {
+  display: block;
+  top: 5;
+  right: 5;
+  width: 7%;
 }
 
 /* Create four equal columns that floats next to eachother */
